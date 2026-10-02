@@ -28,4 +28,7 @@ dependencyResolutionManagement {
 }
 
 include(":androidApp")
+include(":desktopApp")
+include(":effects")
 include(":shared")
+include(":film")
