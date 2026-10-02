@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- libraries.dev is dark-only: paint the window #121212 so launch never flashes white. -->
+    <style name="Theme.Kraft" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/kraft_background</item>
+        <item name="android:colorBackground">@color/kraft_background</item>
+    </style>
+</resources>
