@@ -13,6 +13,9 @@
   <a href="https://www.youtube.com/watch?v=YOUR_VIDEO_ID"><b>▶ Watch the 70-second film on YouTube</b></a>
 </p>
 
+> [!WARNING]
+> **Kraft is still under development.** The effects work and the tests pass, but the library isn't published to Maven Central or anywhere else yet. There are no versioned releases, and the API may change from one commit to the next. For now you can run the app to try the effects, or copy the `effects` module into your own project ([see how](#adding-it-to-your-project)).
+
 ---
 
 ## What is this?
@@ -179,7 +182,7 @@ You need `ffmpeg` on your path and `numpy scipy soundfile` for Python. The gener
 
 ## Known limitations
 
-- Not on Maven Central yet (see above). The API may change.
+- Still under development: not on Maven Central, no tagged releases, and the API may change.
 - The landing page's company logos and testimonials are placeholder content, not real customers or quotes.
 - The target is close parity with the web originals, and a few small visual differences remain. Please file an issue if you spot one.
 
