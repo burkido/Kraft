@@ -1,19 +1,46 @@
-*.iml
-.kotlin
+# Gradle / Kotlin
 .gradle
+.kotlin
 **/build/
-xcuserdata
 !src/**/build/
 local.properties
-.idea
-.DS_Store
+*.hprof
+
+# Android
 captures
 .externalNativeBuild
 .cxx
+*.apk
+*.aab
+*.jks
+*.keystore
+
+# IDEs and editors
+.idea
+*.iml
+.fleet
+.vscode
+
+# Xcode
+xcuserdata
+DerivedData/
 *.xcodeproj/*
 !*.xcodeproj/project.pbxproj
 !*.xcodeproj/xcshareddata/
 !*.xcodeproj/project.xcworkspace/
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
+
+# Python (film tools)
+__pycache__/
+*.pyc
+.venv/
+
+# Secrets
+.env
+.env.*
+
+# OS
+.DS_Store
+
 node_modules/
