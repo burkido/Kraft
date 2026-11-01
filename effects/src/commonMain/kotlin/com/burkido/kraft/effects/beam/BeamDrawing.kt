@@ -17,7 +17,8 @@ import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.layer.GraphicsLayer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import com.burkido.kraft.effects.core.gaussianBlur
+import com.burkido.kraft.effects.core.LayerBlur
+import com.burkido.kraft.effects.core.recordBlurred
 import kotlin.math.ceil
 
 /**
@@ -99,6 +100,7 @@ internal fun ringPath(w: Float, h: Float, radius: Float, width: Float): Path = P
  */
 internal fun DrawScope.recordInsetShadow(
     layer: GraphicsLayer,
+    blur: LayerBlur,
     w: Float,
     h: Float,
     radius: Float,
@@ -108,9 +110,8 @@ internal fun DrawScope.recordInsetShadow(
 ) {
     val sigma = blurPx / 2f
     val margin = ceil(sigma * 4f).toInt() + 1
-    layer.renderEffect = gaussianBlur(sigma)
     layer.topLeft = IntOffset(-margin, -margin)
-    layer.record(IntSize(w.toInt() + 2 * margin, h.toInt() + 2 * margin)) {
+    recordBlurred(layer, blur, sigma, IntSize(w.toInt() + 2 * margin, h.toInt() + 2 * margin)) {
         translate(margin.toFloat(), margin.toFloat()) {
             val frame = Path().apply {
                 fillType = PathFillType.EvenOdd

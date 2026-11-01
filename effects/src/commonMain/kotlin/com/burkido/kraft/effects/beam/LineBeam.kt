@@ -10,7 +10,8 @@ import androidx.compose.ui.graphics.layer.drawLayer
 import com.burkido.kraft.effects.core.CssFilter
 import com.burkido.kraft.effects.core.CubicBezier
 import com.burkido.kraft.effects.core.Keyframes
-import com.burkido.kraft.effects.core.gaussianBlur
+import com.burkido.kraft.effects.core.LayerBlur
+import com.burkido.kraft.effects.core.recordBlurred
 import com.burkido.kraft.effects.core.parseCssColor
 
 /**
@@ -47,9 +48,11 @@ internal class LineBeamPainter(
     private val innerMask = cache.obtainGraphicsLayer()
     private val innerOuter = cache.obtainGraphicsLayer()
     private val insetShadow = cache.obtainGraphicsLayer()
+    private val insetShadowBlur = LayerBlur(cache::obtainGraphicsLayer)
     private val strokeContent = cache.obtainGraphicsLayer()
     private val strokeOuter = cache.obtainGraphicsLayer()
     private val bloomContent = cache.obtainGraphicsLayer()
+    private val bloomBlur = LayerBlur(cache::obtainGraphicsLayer)
     private val bloomOuter = cache.obtainGraphicsLayer()
 
     private class Blob(val gradient: EllipseGradient, val sizeW: Float, val sizeH: Float, val dx: Float, val dy: Float)
@@ -96,7 +99,7 @@ internal class LineBeamPainter(
     override fun drawOver(scope: DrawScope, t: Double, fade: Float): Unit = with(scope) {
         if (w <= 0f || h <= 0f) return
         if (!staticRecorded) {
-            recordInsetShadow(insetShadow, w, h, radius * d, 9f * d, 1f * d, parseCssColor(preset.innerShadow))
+            recordInsetShadow(insetShadow, insetShadowBlur, w, h, radius * d, 9f * d, 1f * d, parseCssColor(preset.innerShadow))
             recordEdgeFadeMask(innerMask, w, h, spec.rotate.innerEdgeMaskPx.toFloat() * d)
             staticRecorded = true
         }
@@ -151,9 +154,8 @@ internal class LineBeamPainter(
         drawLayer(strokeOuter)
 
         // z 3 — bloom: blur, then the hue/brightness/saturate matrix, then the window mask.
-        bloomContent.renderEffect = gaussianBlur(bloomBlurPx * d)
         bloomContent.colorFilter = bloomFilter
-        bloomContent.record {
+        recordBlurred(bloomContent, bloomBlur, bloomBlurPx * d) {
             clipPath(bloomBackground) {
                 for (i in bloomGradients.indices.reversed()) {
                     val (g, gradient) = bloomGradients[i]

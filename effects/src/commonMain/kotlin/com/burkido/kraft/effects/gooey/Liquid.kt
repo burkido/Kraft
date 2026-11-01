@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.burkido.kraft.effects.core.CubicBezier
+import com.burkido.kraft.effects.core.KraftBlur
 import com.burkido.kraft.effects.core.rememberReducedMotion
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -106,18 +107,17 @@ fun Liquid(
                 // The filter region: room for the goo blur, the shadow passes, blobs travelling
                 // past the group box and the drop shadows' reach.
                 val pad = ceil(blur.toPx() * 3 + svgExtent + filterPadding.toPx() + dropSigma * 3).toInt()
-                layer.renderEffect = liquidRenderEffect(
-                    blurPx = blur.toPx(),
-                    contrast = contrast,
-                    shadows = shadow.map { ShadowPx(it.x.toPx(), it.y.toPx(), it.blur.toPx(), it.spread.toPx(), it.color, it.inset) },
-                )
+                val shadowPx = shadow.map { ShadowPx(it.x.toPx(), it.y.toPx(), it.blur.toPx(), it.spread.toPx(), it.color, it.inset) }
+                // Where render effects don't run, the same filter chain is built from layers.
+                val layered = if (KraftBlur.useFallback) LiquidLayers(::obtainGraphicsLayer, blur.toPx(), contrast, fill, shadowPx) else null
+                if (layered == null) layer.renderEffect = liquidRenderEffect(blurPx = blur.toPx(), contrast = contrast, shadows = shadowPx)
                 onDrawBehind {
                     engine.tick // Every engine step redraws the surface, never recomposes.
                     val nudge = liquidOffset()
                     layer.topLeft = IntOffset(-pad + nudge.x.roundToInt(), -pad + nudge.y.roundToInt())
-                    layer.record(IntSize(size.width.toInt() + 2 * pad, size.height.toInt() + 2 * pad)) {
-                        translate(pad.toFloat(), pad.toFloat()) { engine.drawBlobs(this, fill) }
-                    }
+                    val filterSize = IntSize(size.width.toInt() + 2 * pad, size.height.toInt() + 2 * pad)
+                    val blobs: DrawScope.() -> Unit = { translate(pad.toFloat(), pad.toFloat()) { engine.drawBlobs(this, fill) } }
+                    if (layered != null) layered.record(this, layer, filterSize, blobs) else layer.record(filterSize, blobs)
                     drawLayer(layer)
                 }
             },

@@ -34,9 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -58,6 +56,7 @@ import com.burkido.kraft.effects.avatars.BotAvatarType
 import com.burkido.kraft.effects.avatars.botAvatarPointer
 import com.burkido.kraft.effects.avatars.preset
 import com.burkido.kraft.effects.core.CubicBezier
+import com.burkido.kraft.effects.core.kraftBlur
 import kotlinx.coroutines.delay
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -312,16 +311,22 @@ private fun StreamedReply(reply: String, style: androidx.compose.ui.text.TextSty
             BasicText(
                 if (i < words.size - 1) "$w " else w,
                 style = style,
-                modifier = Modifier.graphicsLayer {
-                    val t = ((elapsed - i * 60L) / 350f).coerceIn(0f, 1f)
-                    val e = StreamEase.transform(t.toDouble()).toFloat()
-                    alpha = e
-                    val r = (1f - e) * density
-                    renderEffect = if (r > 0.05f) BlurEffect(r, r, TileMode.Decal) else null
-                },
+                modifier = Modifier
+                    .graphicsLayer { alpha = streamEase(elapsed, i) }
+                    .kraftBlur {
+                        // A Compose blur radius r is σ = 0.57735·r + 0.5.
+                        val r = (1f - streamEase(elapsed, i)) * density
+                        if (r > 0.05f) 0.57735f * r + 0.5f else 0f
+                    },
             )
         }
     }
+}
+
+/** Word [i]'s 0..1 entrance [elapsed] ms into the stream: 60 ms apart, 350 ms each. */
+private fun streamEase(elapsed: Long, i: Int): Float {
+    val t = ((elapsed - i * 60L) / 350f).coerceIn(0f, 1f)
+    return StreamEase.transform(t.toDouble()).toFloat()
 }
 
 // ── Playground ────────────────────────────────────────────────────────────────────────────

@@ -4,13 +4,20 @@ import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Shader
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.toArgb
 import com.burkido.kraft.effects.core.blurRadiusForSigma
 import android.graphics.RenderEffect as PlatformEffect
 
-internal actual fun liquidRenderEffect(blurPx: Float, contrast: Float, shadows: List<ShadowPx>): RenderEffect? {
+/** `android.graphics.RenderEffect` is Android 12+: older versions draw [LiquidLayers] instead. */
+internal actual fun liquidRenderEffect(blurPx: Float, contrast: Float, shadows: List<ShadowPx>): RenderEffect? =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) platformLiquidEffect(blurPx, contrast, shadows) else null
+
+@RequiresApi(Build.VERSION_CODES.S)
+private fun platformLiquidEffect(blurPx: Float, contrast: Float, shadows: List<ShadowPx>): RenderEffect {
     val intercept = gooIntercept(contrast)
     val sigma = blurPx
     val blurred: PlatformEffect? = blurRadiusForSigma(sigma).takeIf { it > 0f }?.let {

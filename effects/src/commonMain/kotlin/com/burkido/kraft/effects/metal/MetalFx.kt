@@ -38,7 +38,8 @@ import com.burkido.kraft.effects.beam.recordInsetShadow
 import com.burkido.kraft.effects.core.EffectTheme
 import com.burkido.kraft.effects.core.LocalEffectFrozenTime
 import com.burkido.kraft.effects.core.PixelSurface
-import com.burkido.kraft.effects.core.gaussianBlur
+import com.burkido.kraft.effects.core.LayerBlur
+import com.burkido.kraft.effects.core.recordBlurred
 import com.burkido.kraft.effects.core.isDark
 import com.burkido.kraft.effects.core.rememberEffectActivity
 import kotlin.math.max
@@ -260,8 +261,10 @@ internal class MetalRingPainter(
     private val surroundPath = Path()
     private val shifted = Path()
     private val beforeGlow: GraphicsLayer = scope.obtainGraphicsLayer()
+    private val beforeGlowBlur = LayerBlur(scope::obtainGraphicsLayer)
     private val rimLayer: GraphicsLayer = scope.obtainGraphicsLayer()
     private val rimBlur: GraphicsLayer = scope.obtainGraphicsLayer()
+    private val rimBlurChain = LayerBlur(scope::obtainGraphicsLayer)
     private val glowLayer: GraphicsLayer = scope.obtainGraphicsLayer()
     private var beforeKey = ""
 
@@ -302,7 +305,7 @@ internal class MetalRingPainter(
             val key = "$w|$h|$r|$dark"
             if (key != beforeKey) {
                 beforeKey = key
-                recordInsetShadow(beforeGlow, w * d, h * d, r * d, 50 * d, 0f, if (dark) Color.White.copy(alpha = 0.02f) else Color.Black.copy(alpha = 0.02f))
+                recordInsetShadow(beforeGlow, beforeGlowBlur, w * d, h * d, r * d, 50 * d, 0f, if (dark) Color.White.copy(alpha = 0.02f) else Color.Black.copy(alpha = 0.02f))
             }
             clipPath(outerPath) { drawLayer(beforeGlow) }
         }
@@ -315,8 +318,7 @@ internal class MetalRingPainter(
             shifted.rewind()
             shifted.addPath(bandPath, Offset(0f, d))
             shifted.fillType = PathFillType.EvenOdd
-            rimBlur.renderEffect = gaussianBlur(0.5f * d)
-            rimBlur.record(IntSize(size.width.toInt(), size.height.toInt())) {
+            recordBlurred(rimBlur, rimBlurChain, 0.5f * d, IntSize(size.width.toInt(), size.height.toInt())) {
                 drawPath(bandPath, Color.White)
                 drawPath(shifted, Color.White, blendMode = BlendMode.DstOut)
             }

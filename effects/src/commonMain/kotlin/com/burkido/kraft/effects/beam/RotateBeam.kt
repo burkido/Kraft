@@ -23,7 +23,8 @@ import androidx.compose.ui.unit.IntSize
 import com.burkido.kraft.effects.core.CssFilter
 import com.burkido.kraft.effects.core.CubicBezier
 import com.burkido.kraft.effects.core.Keyframes
-import com.burkido.kraft.effects.core.gaussianBlur
+import com.burkido.kraft.effects.core.LayerBlur
+import com.burkido.kraft.effects.core.recordBlurred
 import com.burkido.kraft.effects.core.positiveFraction
 import com.burkido.kraft.effects.core.jsRound
 import com.burkido.kraft.effects.core.parseCssColor
@@ -61,9 +62,11 @@ internal class RotateBeamPainter(
     private val innerMask = cache.obtainGraphicsLayer()
     private val innerOuter = cache.obtainGraphicsLayer()
     private val insetShadow = cache.obtainGraphicsLayer()
+    private val insetShadowBlur = LayerBlur(cache::obtainGraphicsLayer)
     private val strokeContent = cache.obtainGraphicsLayer()
     private val strokeOuter = cache.obtainGraphicsLayer()
     private val bloomContent = cache.obtainGraphicsLayer()
+    private val bloomBlur = LayerBlur(cache::obtainGraphicsLayer)
     private val bloomOuter = cache.obtainGraphicsLayer()
 
     private val strokeBlobs = config.strokeBlobs.map { blobBrush(it) }
@@ -143,8 +146,7 @@ internal class RotateBeamPainter(
         drawLayer(strokeOuter)
 
         // z 3 — bloom: the filter (blur) runs before the ring mask, as CSS orders it.
-        bloomContent.renderEffect = gaussianBlur(config.bloomBlurPx * density)
-        bloomContent.record {
+        recordBlurred(bloomContent, bloomBlur, config.bloomBlurPx * density) {
             clipPath(bloomBackground) { drawRect(bloom) }
         }
         bloomOuter.compositingStrategy = CompositingStrategy.Offscreen
@@ -163,9 +165,8 @@ internal class RotateBeamPainter(
         val margin = ceil(sigma * 4f).toInt() + 1
         val spread = config.insetShadowSpreadPx * density
         val r = config.radius * density
-        insetShadow.renderEffect = gaussianBlur(sigma)
         insetShadow.topLeft = IntOffset(-margin, -margin)
-        insetShadow.record(IntSize(w.toInt() + 2 * margin, h.toInt() + 2 * margin)) {
+        recordBlurred(insetShadow, insetShadowBlur, sigma, IntSize(w.toInt() + 2 * margin, h.toInt() + 2 * margin)) {
             translate(margin.toFloat(), margin.toFloat()) {
                 val frame = Path().apply {
                     fillType = PathFillType.EvenOdd

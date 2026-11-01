@@ -11,13 +11,12 @@ import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.burkido.kraft.effects.core.gaussianBlur
+import com.burkido.kraft.effects.core.kraftBlur
 
 /** One CSS `box-shadow` entry. */
 @Immutable
@@ -103,11 +102,7 @@ private fun BoxShadow.composeBlurRadius(): Dp {
  * CSS `filter: blur(<sigma>)`: a Gaussian of standard deviation [sigma] that spills past the
  * element's box, unlike [androidx.compose.ui.draw.blur]'s default clipping and radius units.
  */
-fun Modifier.cssBlur(sigma: Dp): Modifier = this.graphicsLayer {
-    val s = sigma.toPx()
-    renderEffect = gaussianBlur(s)
-    clip = false
-}
+fun Modifier.cssBlur(sigma: Dp): Modifier = this.kraftBlur { sigma.toPx() }
 
 /**
  * A negative CSS `margin-top`: pulls this element (and everything after it) up by [amount],

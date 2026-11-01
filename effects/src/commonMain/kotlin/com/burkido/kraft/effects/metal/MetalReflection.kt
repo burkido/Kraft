@@ -30,7 +30,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import com.burkido.kraft.effects.core.gaussianBlur
+import com.burkido.kraft.effects.core.LayerBlur
+import com.burkido.kraft.effects.core.recordBlurred
 import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
@@ -96,6 +97,7 @@ internal class ReflectionPainter(scope: CacheDrawScope) {
     // recurses on Skiko, so nothing inside record{} may ask for it.
     private val d = scope.density
     private val fillLayer: GraphicsLayer = scope.obtainGraphicsLayer()
+    private val fillBlur = LayerBlur(scope::obtainGraphicsLayer)
     private val strokeLayer: GraphicsLayer = scope.obtainGraphicsLayer()
 
     // The letterforms as a DstIn layer: a layer composites over its whole bounds, so it clears
@@ -182,10 +184,9 @@ internal class ReflectionPainter(scope: CacheDrawScope) {
             if (glyph) {
                 // Letterforms: the mirrored sheet itself, one pass, kept to anti-aliasing blur.
                 val alpha = min(1f, reflectionAlpha * FillOpacityMul)
-                fillLayer.renderEffect = gaussianBlur(0.4f * d)
                 fillLayer.colorFilter = saturateBrighten(1.35f, 1.2f)
                 glyphLayer.record(IntSize(tw.roundToInt(), th.roundToInt())) { glyphMask.invoke(this) }
-                fillLayer.record(IntSize(tw.roundToInt(), th.roundToInt())) {
+                recordBlurred(fillLayer, fillBlur, 0.4f * d, IntSize(tw.roundToInt(), th.roundToInt())) {
                     drawSource(anchor, image, layout, alpha, sheetOnly = true)
                     drawRect(gradient, blendMode = BlendMode.DstIn)
                     drawLayer(glyphLayer)
@@ -199,9 +200,8 @@ internal class ReflectionPainter(scope: CacheDrawScope) {
             clipPath(clip) {
                 // Fill: the mirrored band in the edge strip, blurred and lifted.
                 val fillAlpha = min(MaxAlphaStack, reflectionAlpha * FillExtraAlpha * FillOpacityMul * FillCircleAttenuation)
-                fillLayer.renderEffect = gaussianBlur(FillBlur * d)
                 fillLayer.colorFilter = saturateBrighten(1.2f, 1.58f)
-                fillLayer.record(IntSize(tw.roundToInt(), th.roundToInt())) {
+                recordBlurred(fillLayer, fillBlur, FillBlur * d, IntSize(tw.roundToInt(), th.roundToInt())) {
                     passes(anchor, image, layout, fillAlpha, edgeBand(box, (RangePx + FillBlur * 3) * d), gradient)
                 }
                 drawLayer(fillLayer)

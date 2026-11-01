@@ -23,7 +23,8 @@ import com.burkido.kraft.effects.beam.recordInsetShadow
 import com.burkido.kraft.effects.beam.ringPath
 import com.burkido.kraft.effects.beam.roundRectPath
 import com.burkido.kraft.effects.core.CssFilter
-import com.burkido.kraft.effects.core.gaussianBlur
+import com.burkido.kraft.effects.core.LayerBlur
+import com.burkido.kraft.effects.core.recordBlurred
 import kotlin.math.max
 import kotlin.math.min
 
@@ -50,13 +51,18 @@ internal class VoicePainter(scope: CacheDrawScope, setup: VoiceSetup) {
     private val strokeLayer = scope.obtainGraphicsLayer()
     private val innerLayer = scope.obtainGraphicsLayer()
     private val insetShadow = scope.obtainGraphicsLayer()
+    private val insetShadowBlur = LayerBlur(scope::obtainGraphicsLayer)
     private val edgeFade = scope.obtainGraphicsLayer()
     private val bloomLayer = scope.obtainGraphicsLayer()
     private val bloomBlurLayer = scope.obtainGraphicsLayer()
+    private val bloomBlur = LayerBlur(scope::obtainGraphicsLayer)
     private val bandLayer = scope.obtainGraphicsLayer()
     private val haloLayer = scope.obtainGraphicsLayer()
+    private val haloBlur = LayerBlur(scope::obtainGraphicsLayer)
     private val ridgeLayer = scope.obtainGraphicsLayer()
+    private val ridgeBlur = LayerBlur(scope::obtainGraphicsLayer)
     private val coreLayer = scope.obtainGraphicsLayer()
+    private val coreBlur = LayerBlur(scope::obtainGraphicsLayer)
 
     private val strokeLobes = lobeGradients(spec.colors, 1f, spec.fade)
     private val innerLobes = lobeGradients(spec.colors, 0.46f, spec.fade)
@@ -118,28 +124,35 @@ internal class VoicePainter(scope: CacheDrawScope, setup: VoiceSetup) {
     private val soft = 0.5f
     private val bandScale = min(1f, 2f / d)
 
-    init {
-        bloomBlurLayer.renderEffect = gaussianBlur((spec.bloomBlur * d * soft).toFloat())
-        val ridgeBlur = 3.5 * spec.bandWidth / 2
-        ridgeLayer.renderEffect = gaussianBlur((ridgeBlur * d * bandScale).toFloat())
-        haloLayer.renderEffect = gaussianBlur((ridgeBlur * 3 * d * bandScale).toFloat())
-        coreLayer.renderEffect = gaussianBlur((spec.coreBlur * d * soft).toFloat())
-    }
+    // Blur σ of each layer, in that layer's own (scaled) pixels.
+    private val bloomSigma = (spec.bloomBlur * d * soft).toFloat()
+    private val ridgeSigma = (3.5 * spec.bandWidth / 2 * d * bandScale).toFloat()
+    private val haloSigma = ridgeSigma * 3
+    private val coreSigma = (spec.coreBlur * d * soft).toFloat()
 
-    /** Records [layer] at [q] of the element's resolution; it draws back scaled up by 1 / [q]. */
-    private fun DrawScope.recordScaled(layer: GraphicsLayer, q: Float, block: DrawScope.() -> Unit) {
+    /**
+     * Records [layer] at [q] of the element's resolution; it draws back scaled up by 1 / [q].
+     * With a [blur], the recording is blurred by [sigma].
+     */
+    private fun DrawScope.recordScaled(
+        layer: GraphicsLayer,
+        q: Float,
+        blur: LayerBlur? = null,
+        sigma: Float = 0f,
+        block: DrawScope.() -> Unit,
+    ) {
         layer.pivotOffset = Offset.Zero
         layer.scaleX = 1f / q
         layer.scaleY = 1f / q
-        layer.record(IntSize(ceil(width * q).toInt(), ceil(height * q).toInt())) {
-            scale(q, q, pivot = Offset.Zero) { block() }
-        }
+        val size = IntSize(ceil(width * q).toInt(), ceil(height * q).toInt())
+        val scaled: DrawScope.() -> Unit = { scale(q, q, pivot = Offset.Zero) { block() } }
+        if (blur != null) recordBlurred(layer, blur, sigma, size, scaled) else layer.record(size, scaled)
     }
 
     fun draw(scope: DrawScope, f: VoiceFrame, fade: Float): Unit = with(scope) {
         if (width <= 0f || height <= 0f) return
         if (!staticRecorded) {
-            recordInsetShadow(insetShadow, width, height, radius, (spec.insetBlur * d).toFloat(), hairline, spec.innerShadow)
+            recordInsetShadow(insetShadow, insetShadowBlur, width, height, radius, (spec.insetBlur * d).toFloat(), hairline, spec.innerShadow)
             recordEdgeFadeMask(edgeFade, width, height, (spec.cornerFade * d).toFloat())
             staticRecorded = true
         }
@@ -176,7 +189,7 @@ internal class VoicePainter(scope: CacheDrawScope, setup: VoiceSetup) {
 
             // ── Bloom (z 3): blurred, then clipped, then masked ─────────────
             bloomBlurLayer.colorFilter = filter
-            bloomBlurLayer.record(IntSize(ceil(width * soft).toInt(), ceil(height * soft).toInt())) {
+            recordBlurred(bloomBlurLayer, bloomBlur, bloomSigma, IntSize(ceil(width * soft).toInt(), ceil(height * soft).toInt())) {
                 scale(soft, soft, pivot = Offset.Zero) {
                     clipPath(clipInner) { drawLobes(bloomLobes, bloomRx, bloomRy, 0.0, f) }
                 }
@@ -245,10 +258,10 @@ internal class VoicePainter(scope: CacheDrawScope, setup: VoiceSetup) {
             )
         }
 
-        recordScaled(haloLayer, bandScale) {
+        recordScaled(haloLayer, bandScale, haloBlur, haloSigma) {
             drawPath(bandPath, ends(colors.core, base * 0.3), style = Stroke((thickness * 2.2).toFloat(), cap = StrokeCap.Round, join = StrokeJoin.Round))
         }
-        recordScaled(ridgeLayer, bandScale) {
+        recordScaled(ridgeLayer, bandScale, ridgeBlur, ridgeSigma) {
             val ridges = arrayOf(
                 Ridge(colors.above, 1.0, dx, -dy),
                 Ridge(colors.mid, 0.55, dx * 0.35f, -dy * 0.35f),
@@ -285,7 +298,7 @@ internal class VoicePainter(scope: CacheDrawScope, setup: VoiceSetup) {
         val a = fade * min(1.0, f.glow * min(1.0, spec.coreLight) * (1.6 + 1.4 * coreBoost))
         if (a <= 0.0) return
         coreLayer.alpha = opacity(a)
-        recordScaled(coreLayer, soft) {
+        recordScaled(coreLayer, soft, coreBlur, coreSigma) {
             clipPath(clipInner) {
                 clipPath(belowPath) {
                     wash.drawMask(

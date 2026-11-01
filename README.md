@@ -111,6 +111,18 @@ Effects respect the system's reduced-motion setting and pause when they're off s
 
 The module uses the Kotlin serialization plugin and Compose resources, so your version catalog needs the same plugins as the one in [`gradle/libs.versions.toml`](gradle/libs.versions.toml). If you'd like a published artifact, open an issue. If there's interest, I'll set one up.
 
+### Older Android versions
+
+Kraft runs on Android 6.0 (API 23) and newer, as well as iOS and desktop. Android's GPU blur (`RenderEffect`) only arrived in Android 12. On older versions the effects build each blur from a chain of offscreen layers that scale down and back up, and the GPU does the filtering. Gooey goes a step further and rebuilds its whole filter chain this way, including the blur, the threshold, the tints and the shadows. You don't need to change anything: the library picks the right path at runtime, and the result looks almost identical.
+
+To check the fallback on a newer device, turn it on before the effects first draw:
+
+```kotlin
+KraftBlur.forceFallback = true   // com.burkido.kraft.effects.core.KraftBlur
+```
+
+Your own UI can use the same blur through `Modifier.kraftBlur { sigmaPx }`. It works like CSS `filter: blur()` and falls back the same way.
+
 ## Running the app
 
 You'll need:
@@ -136,6 +148,12 @@ cd Kraft
 ./gradlew :androidApp:installDebug
 ```
 
+To compare the Android 11-and-older blur with the normal one on the same device, launch a page with the fallback forced on and the animation frozen at a fixed time. Then run it again without `blurFallback` and compare the screenshots:
+
+```sh
+adb shell am start -n com.burkido.kraft/.MainActivity --es library gooey --ez blurFallback true --ef frozenTime 1.5
+```
+
 For **iOS**, open `iosApp/iosApp.xcodeproj` in Xcode and run it. If you want to run on a real device, set your `TEAM_ID` in `iosApp/Configuration/Config.xcconfig`.
 
 The Voice page's playground asks for microphone access so the glow can follow your voice. The demos above it run on a built-in level, so you can skip the mic and still see everything.
@@ -158,9 +176,10 @@ docs/media/   Images used in this README
 ./gradlew :effects:jvmTest :shared:jvmTest
 ```
 
-This runs three kinds of check:
+This runs four kinds of check:
 
 - **Orb golden test.** Checks the orbs against upstream's golden vectors: 9 states × 2 sizes × 4 timestamps, every dot.
+- **Blur plan test.** Checks that the fallback's layer chain gives the blur strength each effect asks for, from sub-pixel blurs up to large glows.
 - **Parity renders.** Draw each effect in upstream's parity scenes and save PNGs to `effects/build/parity/` for comparison with the web.
 - **`ScreenshotRender`.** Renders every app page headlessly into `shared/build/screens/`. The screenshots above came from there.
 
@@ -185,6 +204,7 @@ You need `ffmpeg` on your path and `numpy scipy soundfile` for Python. The gener
 - Still under development: not on Maven Central, no tagged releases, and the API may change.
 - The landing page's company logos and testimonials are placeholder content, not real customers or quotes.
 - The target is close parity with the web originals, and a few small visual differences remain. Please file an issue if you spot one.
+- On Android 11 and older, blurs use the layer fallback. It matches the Android 12+ blur to within a pixel or two at blur edges, but I've only tested it on emulators so far, not on real old devices.
 
 ## Contributing
 

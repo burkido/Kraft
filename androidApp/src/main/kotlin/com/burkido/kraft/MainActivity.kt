@@ -18,10 +18,13 @@ class MainActivity : ComponentActivity() {
         )
         super.onCreate(savedInstanceState)
 
-        // `adb shell am start -n com.burkido.kraft/.MainActivity --es library beam`
+        // `adb shell am start -n com.burkido.kraft/.MainActivity --es library beam`, plus
+        // `--ez blurFallback true` and `--ef frozenTime 1.5` to compare the Android < 12 blur.
         val startLibrary = intent?.getStringExtra("library")
+        val forceBlurFallback = intent?.getBooleanExtra("blurFallback", false) ?: false
+        val frozenTime = intent?.takeIf { it.hasExtra("frozenTime") }?.getFloatExtra("frozenTime", 0f)?.toDouble()
         setContent {
-            App(startLibrary = startLibrary)
+            App(startLibrary = startLibrary, forceBlurFallback = forceBlurFallback, frozenTime = frozenTime)
         }
     }
 }

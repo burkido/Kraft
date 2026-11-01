@@ -8,6 +8,7 @@ import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
@@ -41,7 +42,7 @@ actual fun rememberMicrophone(): Microphone {
 
 /**
  * `AudioRecord` at 48 kHz mono float, from the UNPROCESSED source where the device has one (no
- * automatic gain or noise suppression), VOICE_RECOGNITION otherwise.
+ * automatic gain or noise suppression; Android 7+), VOICE_RECOGNITION otherwise.
  */
 private class AndroidCapture(private val context: Context, private val mic: Microphone) {
     @Volatile private var running = false
@@ -56,7 +57,9 @@ private class AndroidCapture(private val context: Context, private val mic: Micr
             return
         }
         val audio = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val source = if (audio.getProperty(AudioManager.PROPERTY_SUPPORT_AUDIO_SOURCE_UNPROCESSED) == "true") {
+        val unprocessed = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N &&
+            audio.getProperty(AudioManager.PROPERTY_SUPPORT_AUDIO_SOURCE_UNPROCESSED) == "true"
+        val source = if (unprocessed) {
             MediaRecorder.AudioSource.UNPROCESSED
         } else {
             MediaRecorder.AudioSource.VOICE_RECOGNITION

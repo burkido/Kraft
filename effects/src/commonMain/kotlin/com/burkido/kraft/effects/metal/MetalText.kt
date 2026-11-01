@@ -37,7 +37,8 @@ import com.burkido.kraft.effects.beam.EllipseGradient
 import com.burkido.kraft.effects.beam.recordInsetShadow
 import com.burkido.kraft.effects.core.EffectTheme
 import com.burkido.kraft.effects.core.LocalEffectFrozenTime
-import com.burkido.kraft.effects.core.gaussianBlur
+import com.burkido.kraft.effects.core.LayerBlur
+import com.burkido.kraft.effects.core.recordBlurred
 import com.burkido.kraft.effects.core.isDark
 import com.burkido.kraft.effects.core.rememberEffectActivity
 import kotlin.math.max
@@ -88,7 +89,9 @@ fun MetalText(
             .onGloballyPositioned { anchor?.coords = it }
             .drawWithCache {
                 val metal = obtainGraphicsLayer()
-                val rimBlur = obtainGraphicsLayer().apply { renderEffect = gaussianBlur(0.5f * density) }
+                val rimBlur = obtainGraphicsLayer()
+                val rimBlurChain = LayerBlur(::obtainGraphicsLayer)
+                val rimSigma = 0.5f * density
                 val rim = obtainGraphicsLayer().apply { this.alpha = 0.9f }
                 // Clips the blurred rim to the glyphs (a DstIn layer clears between them too).
                 val glyphs = obtainGraphicsLayer().apply { blendMode = BlendMode.DstIn }
@@ -118,7 +121,7 @@ fun MetalText(
                         // Read outside record{}: a recording scope's density resolves back through
                         // the node's draw scope and recurses on Skiko.
                         val shift = density
-                        rimBlur.record(sizePx) {
+                        recordBlurred(rimBlur, rimBlurChain, rimSigma, sizePx) {
                             drawText(layout, color = Color.White)
                             translate(0f, shift) { drawText(layout, color = Color.White, blendMode = BlendMode.DstOut) }
                         }
@@ -225,6 +228,7 @@ fun MetalBadge(
                     // The clean core: an ellipse at 49 % of the box, solid to 46 %, gone at its edge.
                     val core = EllipseGradient(arrayOf(0.46f to Color.White, 1f to Color.White.copy(alpha = 0f)))
                     val glows = obtainGraphicsLayer()
+                    val glowsBlur = LayerBlur(::obtainGraphicsLayer)
                     var recorded = false
                     // The 0.833 dp inner rim and the 0.833 dp top light (`inset 0 .833px 0`).
                     val rim = Path().apply {
@@ -240,7 +244,7 @@ fun MetalBadge(
                     onDrawBehind {
                         if (!recorded) {
                             recorded = true
-                            recordInsetShadow(glows, size.width, size.height, r, 8.333f * k, 0f, Color.White.copy(alpha = 0.41f))
+                            recordInsetShadow(glows, glowsBlur, size.width, size.height, r, 8.333f * k, 0f, Color.White.copy(alpha = 0.41f))
                         }
                         clipPath(pill) {
                             core.draw(this, size.width / 2, size.height / 2, size.width * 0.49f, size.height * 0.49f, alpha = 0.94f)

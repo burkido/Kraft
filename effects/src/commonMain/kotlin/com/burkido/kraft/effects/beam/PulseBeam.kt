@@ -13,7 +13,8 @@ import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.burkido.kraft.effects.core.CssFilter
-import com.burkido.kraft.effects.core.gaussianBlur
+import com.burkido.kraft.effects.core.LayerBlur
+import com.burkido.kraft.effects.core.recordBlurred
 import com.burkido.kraft.effects.core.positiveFraction
 import kotlin.math.PI
 import kotlin.math.ceil
@@ -92,6 +93,7 @@ internal class PulseBeamPainter(
     private val innerMask = cache.obtainGraphicsLayer()
     private val innerOuter = cache.obtainGraphicsLayer()
     private val bloomContent = cache.obtainGraphicsLayer()
+    private val bloomBlur = LayerBlur(cache::obtainGraphicsLayer)
     private val bloomOuter = cache.obtainGraphicsLayer()
     private val corner = pulse.innerCornerAccent
     private val cornerGradient = EllipseGradient(
@@ -105,7 +107,9 @@ internal class PulseBeamPainter(
 
     // pulse-outside
     private val coreLayer = cache.obtainGraphicsLayer()
+    private val coreBlur = LayerBlur(cache::obtainGraphicsLayer)
     private val bloomHaloLayer = cache.obtainGraphicsLayer()
+    private val bloomHaloBlur = LayerBlur(cache::obtainGraphicsLayer)
 
     private var staticRecorded = false
 
@@ -116,12 +120,12 @@ internal class PulseBeamPainter(
         val filter = filter(t)
         // ::before — the core glow, 10 px outside the element.
         drawHalo(
-            scope, coreLayer, c.coreInsetPx.toFloat(), c.glowBlurPx.getValue(theme).toFloat(), filter,
+            scope, coreLayer, coreBlur, c.coreInsetPx.toFloat(), c.glowBlurPx.getValue(theme).toFloat(), filter,
             (fade * preset.innerOpacity.toFloat() * monoMul * strengthMul).coerceIn(0f, 1f),
         ) { boxW, boxH -> drawLiveBlobs(pulse.outerCore, boxW, boxH) }
         // [data-beam-bloom] — the frozen outer bloom, 30 px outside it.
         drawHalo(
-            scope, bloomHaloLayer, c.bloomInsetPx.toFloat(), c.bloomBlurPx.getValue(theme).toFloat(), filter,
+            scope, bloomHaloLayer, bloomHaloBlur, c.bloomInsetPx.toFloat(), c.bloomBlurPx.getValue(theme).toFloat(), filter,
             (fade * preset.bloomOpacity.toFloat() * monoMul * strengthMul).coerceIn(0f, 1f),
         ) { boxW, boxH -> drawFrozenBlobs(pulse.outerBloom, boxW, boxH) }
     }
@@ -177,9 +181,8 @@ internal class PulseBeamPainter(
 
         if (!outside) {
             // z 3 — frozen bloom: blur, colour matrix, then the ring mask.
-            bloomContent.renderEffect = gaussianBlur(pulse.innerBloomBlurPx.toFloat() * d)
             bloomContent.colorFilter = filter
-            bloomContent.record { clipPath(innerBackground) { drawFrozenBlobs(pulse.innerBloom, w, h) } }
+            recordBlurred(bloomContent, bloomBlur, pulse.innerBloomBlurPx.toFloat() * d) { clipPath(innerBackground) { drawFrozenBlobs(pulse.innerBloom, w, h) } }
             bloomOuter.compositingStrategy = CompositingStrategy.Offscreen
             bloomOuter.alpha = (fade * preset.bloomOpacity.toFloat() * monoMul * strengthMul).coerceIn(0f, 1f)
             bloomOuter.record { clipPath(ring) { drawLayer(bloomContent) } }
@@ -255,6 +258,7 @@ internal class PulseBeamPainter(
     private fun drawHalo(
         scope: DrawScope,
         layer: GraphicsLayer,
+        blur: LayerBlur,
         insetPx: Float,
         blurPx: Float,
         filter: ColorFilter,
@@ -269,14 +273,13 @@ internal class PulseBeamPainter(
         val layerW = boxW.toInt() + 2 * margin
         val layerH = boxH.toInt() + 2 * margin
         val scale = pulse.outsideConstants.glowScale
-        layer.renderEffect = gaussianBlur(sigma)
         layer.colorFilter = filter
         layer.alpha = alpha
         layer.scaleX = scale.getValue("x").toFloat()
         layer.scaleY = scale.getValue("y").toFloat()
         layer.pivotOffset = Offset(layerW / 2f, layerH / 2f)
         layer.topLeft = IntOffset(-(inset.toInt() + margin), -(inset.toInt() + margin))
-        layer.record(IntSize(layerW, layerH)) {
+        recordBlurred(layer, blur, sigma, IntSize(layerW, layerH)) {
             translate(margin.toFloat(), margin.toFloat()) {
                 clipPath(roundRectPath(0f, 0f, boxW, boxH, radius * d + inset)) { content(boxW, boxH) }
             }

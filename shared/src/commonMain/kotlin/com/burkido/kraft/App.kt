@@ -17,6 +17,8 @@ import com.burkido.kraft.designsystem.KraftColors
 import com.burkido.kraft.designsystem.KraftTheme
 import com.burkido.kraft.designsystem.LocalViewport
 import com.burkido.kraft.designsystem.Viewport
+import com.burkido.kraft.effects.core.KraftBlur
+import com.burkido.kraft.effects.core.LocalEffectFrozenTime
 import com.burkido.kraft.landing.LandingScreen
 import com.burkido.kraft.landing.LicensesScreen
 import com.burkido.kraft.library.LibraryId
@@ -25,13 +27,18 @@ import com.burkido.kraft.navigation.Route
 
 /**
  * The app root. [startLibrary] opens a library page (or `licenses`) directly (launch argument `--library <name>`),
- * which screenshots and parity recordings use.
+ * which screenshots and parity recordings use. [forceBlurFallback] draws every blur the way Android < 12 does, and
+ * [frozenTime] pins every effect at that many seconds, to compare the two paths frame for frame.
  */
 @Composable
-fun App(startLibrary: String? = null) {
+fun App(startLibrary: String? = null, forceBlurFallback: Boolean = false, frozenTime: Double? = null) {
+    remember(forceBlurFallback) { KraftBlur.forceFallback = forceBlurFallback }
     KraftTheme {
         BoxWithConstraints(Modifier.fillMaxSize().background(KraftColors.Background)) {
-            CompositionLocalProvider(LocalViewport provides Viewport(maxWidth, maxHeight)) {
+            CompositionLocalProvider(
+                LocalViewport provides Viewport(maxWidth, maxHeight),
+                LocalEffectFrozenTime provides frozenTime,
+            ) {
                 val backStack = remember {
                     val start = LibraryId.entries.firstOrNull { it.name.equals(startLibrary, ignoreCase = true) }
                     mutableStateListOf<Route>(Route.Landing).apply {
