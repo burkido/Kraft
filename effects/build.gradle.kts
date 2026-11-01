@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.mavenPublish)
 }
 
 kotlin {
@@ -68,4 +69,18 @@ kotlin {
 compose.resources {
     publicResClass = false
     packageOfResClass = "com.burkido.kraft.effects.resources"
+}
+
+// Coordinates and POM details come from gradle.properties: GROUP, VERSION_NAME and POM_* at the
+// root, POM_ARTIFACT_ID, POM_NAME and POM_DESCRIPTION in this module.
+mavenPublishing {
+    // Uploads to the Central Portal and stops there: the release goes live only after
+    // you press Publish on central.sonatype.com, since Maven Central can't take one back.
+    publishToMavenCentral()
+
+    // Only signed when the key is provided, so publishToMavenLocal works without it.
+    // Maven Central rejects unsigned uploads, so a missing key can't slip through.
+    if (providers.gradleProperty("signingInMemoryKey").isPresent) {
+        signAllPublications()
+    }
 }

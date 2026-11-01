@@ -3,7 +3,9 @@ A Compose Multiplatform port of the Libraries.dev effects and site.
 
 This product includes software and material from third parties. The full
 licence texts ship with the app and live in
-shared/src/commonMain/composeResources/files/licenses/.
+shared/src/commonMain/composeResources/files/licenses/. The published :effects
+library (io.github.burkido:kraft) carries the texts and notice that apply to it
+in effects/src/commonMain/composeResources/files/licenses/.
 
 Libraries.dev (https://github.com/Jakubantalik/Libraries.dev)
   Copyright (c) 2026 Jakub Antalik

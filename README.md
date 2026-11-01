@@ -14,7 +14,7 @@
 </p>
 
 > [!WARNING]
-> **Kraft is still under development.** The effects work and the tests pass, but the library isn't published to Maven Central or anywhere else yet. There are no versioned releases, and the API may change from one commit to the next. For now you can run the app to try the effects, or copy the `effects` module into your own project ([see how](#adding-it-to-your-project)).
+> **Kraft is experimental.** The effects work and the tests pass, but the published versions are alpha pre-releases (`0.1.0-alpha01` and later). The API may change between any two versions, including in ways that break your code, until a stable release comes out. Pin an exact version and read the release notes before you upgrade.
 
 ---
 
@@ -103,13 +103,23 @@ Effects respect the system's reduced-motion setting and pause when they're off s
 
 ### Adding it to your project
 
-**Kraft isn't published to Maven Central yet.** For now, use it as a source module:
+Kraft is on Maven Central as an **experimental alpha**. Add it to your shared module's `commonMain` dependencies:
 
-1. Copy the `effects/` folder into your project.
-2. Add `include(":effects")` to `settings.gradle.kts`.
-3. Add `implementation(project(":effects"))` to your shared module's `commonMain` dependencies.
+```kotlin
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation("io.github.burkido:kraft:0.1.0-alpha01")
+        }
+    }
+}
+```
 
-The module uses the Kotlin serialization plugin and Compose resources, so your version catalog needs the same plugins as the one in [`gradle/libs.versions.toml`](gradle/libs.versions.toml). If you'd like a published artifact, open an issue. If there's interest, I'll set one up.
+Gradle picks the right artifact for each target (Android, iOS arm64, iOS simulator arm64, desktop JVM). In an Android-only project, the same line goes in your regular `dependencies` block.
+
+**About the version.** `0.x` together with `-alphaNN` means there are no API stability guarantees yet. Alphas count up (`alpha01`, `alpha02`, ...), then come betas and release candidates, and only after that a plain `0.1.0`. Pin the exact version rather than using a range or `+`.
+
+You can also use the library as a source module: copy the `effects/` folder into your project, add `include(":effects")` to `settings.gradle.kts`, and depend on `project(":effects")`. The module uses the Kotlin serialization plugin and Compose resources, so your version catalog needs the same plugins as the one in [`gradle/libs.versions.toml`](gradle/libs.versions.toml).
 
 ### Older Android versions
 
@@ -201,7 +211,7 @@ You need `ffmpeg` on your path and `numpy scipy soundfile` for Python. The gener
 
 ## Known limitations
 
-- Still under development: not on Maven Central, no tagged releases, and the API may change.
+- Experimental: only alpha releases so far, and the API may change between versions.
 - The landing page's company logos and testimonials are placeholder content, not real customers or quotes.
 - The target is close parity with the web originals, and a few small visual differences remain. Please file an issue if you spot one.
 - On Android 11 and older, blurs use the layer fallback. It matches the Android 12+ blur to within a pixel or two at blur edges, but I've only tested it on emulators so far, not on real old devices.
@@ -221,4 +231,4 @@ See [`NOTICE`](NOTICE) for exactly what came from where.
 
 ## License
 
-Kraft is released under the [MIT License](LICENSE). You can use it in personal and commercial projects, modify it and redistribute it. Third-party parts keep their own licences, which are listed in [`NOTICE`](NOTICE). Their full texts ship with the app in [`shared/src/commonMain/composeResources/files/licenses/`](shared/src/commonMain/composeResources/files/licenses/).
+Kraft is released under the [MIT License](LICENSE). You can use it in personal and commercial projects, modify it and redistribute it. Third-party parts keep their own licences, which are listed in [`NOTICE`](NOTICE). Their full texts ship with the app in [`shared/src/commonMain/composeResources/files/licenses/`](shared/src/commonMain/composeResources/files/licenses/). The published library carries its own copy of the licences and notice that apply to it, in [`effects/src/commonMain/composeResources/files/licenses/`](effects/src/commonMain/composeResources/files/licenses/).

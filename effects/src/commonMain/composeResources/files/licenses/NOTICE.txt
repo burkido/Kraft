@@ -1,0 +1,21 @@
+Kraft Effects (io.github.burkido:kraft)
+Compose Multiplatform ports of the Libraries.dev effects.
+Copyright (c) 2026 Burak Karaduman. Licensed under the MIT License (Kraft-MIT.txt).
+
+This library includes software from third parties. Their licence texts ship
+next to this file.
+
+Libraries.dev (https://github.com/Jakubantalik/Libraries.dev)
+  Copyright (c) 2026 Jakub Antalik
+  Licensed under the MIT License (LibrariesDev-MIT.txt).
+  The effects (border beam, thinking orbs, bot avatars, liquid gooey, voice
+  glow, metal, image generation) are ports of its packages, including its
+  spec data and bot shapes.
+
+Paper Shaders (https://github.com/paper-design/shaders)
+  Copyright (c) Paper Design, Inc.
+  Licensed under the Apache License, Version 2.0 (PaperShaders-Apache-2.0.txt).
+  The metal effect's material (com.burkido.kraft.effects.metal) is a Kotlin
+  port of the `liquidMetal` fragment shader and its sizing vertex shader. The
+  port evaluates the same maths on the CPU; it changes the shader's form, not
+  its algorithm.
