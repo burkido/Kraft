@@ -14,7 +14,7 @@
 </p>
 
 > [!WARNING]
-> **Kraft is experimental.** The effects work and the tests pass, but the published versions are alpha pre-releases (`0.1.0-alpha01` and later). The API may change between any two versions, including in ways that break your code, until a stable release comes out. Pin an exact version and read the release notes before you upgrade.
+> **Kraft is experimental.** The effects work and the tests pass, but every published version is a `0.x` release. The API may change between any two versions, including in ways that break your code, until `1.0.0` comes out. Pin an exact version and read the release notes before you upgrade.
 
 ---
 
@@ -103,13 +103,13 @@ Effects respect the system's reduced-motion setting and pause when they're off s
 
 ### Adding it to your project
 
-Kraft is on Maven Central as an **experimental alpha**. Add it to your shared module's `commonMain` dependencies:
+Kraft is on Maven Central as an **experimental `0.x` release**. Add it to your shared module's `commonMain` dependencies:
 
 ```kotlin
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("io.github.burkido:kraft:0.1.0-alpha01")
+            implementation("io.github.burkido:kraft:0.1.0")
         }
     }
 }
@@ -117,7 +117,7 @@ kotlin {
 
 Gradle picks the right artifact for each target (Android, iOS arm64, iOS simulator arm64, desktop JVM). In an Android-only project, the same line goes in your regular `dependencies` block.
 
-**About the version.** `0.x` together with `-alphaNN` means there are no API stability guarantees yet. Alphas count up (`alpha01`, `alpha02`, ...), then come betas and release candidates, and only after that a plain `0.1.0`. Pin the exact version rather than using a range or `+`.
+**About the version.** `0.x` means there are no API stability guarantees yet. A release with only bug fixes bumps the last number (`0.1.1`). Anything else, including new effects and API changes, bumps the middle one (`0.2.0`). `1.0.0` will mark the point where the API settles. Pin the exact version rather than using a range or `+`.
 
 You can also use the library as a source module: copy the `effects/` folder into your project, add `include(":effects")` to `settings.gradle.kts`, and depend on `project(":effects")`. The module uses the Kotlin serialization plugin and Compose resources, so your version catalog needs the same plugins as the one in [`gradle/libs.versions.toml`](gradle/libs.versions.toml).
 
@@ -211,7 +211,7 @@ You need `ffmpeg` on your path and `numpy scipy soundfile` for Python. The gener
 
 ## Known limitations
 
-- Experimental: only alpha releases so far, and the API may change between versions.
+- Experimental: only `0.x` releases so far, and the API may change between versions.
 - The landing page's company logos and testimonials are placeholder content, not real customers or quotes.
 - The target is close parity with the web originals, and a few small visual differences remain. Please file an issue if you spot one.
 - On Android 11 and older, blurs use the layer fallback. It matches the Android 12+ blur to within a pixel or two at blur edges, but I've only tested it on emulators so far, not on real old devices.

@@ -1,6 +1,6 @@
 name: Publish
 
-# Push a tag named after VERSION_NAME in gradle.properties, for example v0.1.0-alpha01.
+# Push a tag named after VERSION_NAME in gradle.properties, for example v0.1.0.
 on:
   push:
     tags: [ 'v*' ]
