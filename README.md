@@ -103,13 +103,15 @@ Effects respect the system's reduced-motion setting and pause when they're off s
 
 ### Adding it to your project
 
-Kraft is on Maven Central as an **experimental `0.x` release**. Add it to your shared module's `commonMain` dependencies:
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.burkido/kraft)](https://central.sonatype.com/artifact/io.github.burkido/kraft)
+
+Kraft is on Maven Central as an **experimental `0.x` release**. Add it to your shared module's `commonMain` dependencies, with `<version>` replaced by the latest version from the badge above:
 
 ```kotlin
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("io.github.burkido:kraft:0.1.0")
+            implementation("io.github.burkido:kraft:<version>")
         }
     }
 }
@@ -219,6 +221,8 @@ You need `ffmpeg` on your path and `numpy scipy soundfile` for Python. The gener
 ## Contributing
 
 Issues and pull requests are welcome, whether it's a bug, a parity difference, a new platform target or an idea for an effect. For a bigger change, please open an issue first so we can talk it through.
+
+How versions are numbered and released is in [`docs/RELEASING.md`](docs/RELEASING.md).
 
 ## Credits
 

@@ -73,10 +73,11 @@ compose.resources {
 }
 
 // Coordinates and POM details come from gradle.properties: GROUP, VERSION_NAME and POM_* at the
-// root, POM_ARTIFACT_ID, POM_NAME and POM_DESCRIPTION in this module.
+// root, POM_ARTIFACT_ID, POM_NAME and POM_DESCRIPTION in this module. Releases pass the version
+// from the GitHub release's tag with -PVERSION_NAME, see docs/RELEASING.md.
 mavenPublishing {
-    // Uploads to the Central Portal and stops there: the release goes live only after
-    // you press Publish on central.sonatype.com, since Maven Central can't take one back.
+    // publishAndReleaseToMavenCentral (the Publish workflow) releases right away;
+    // publishToMavenCentral (scripts/publish.sh) stops at Validated until you press Publish.
     publishToMavenCentral()
 
     // Only signed when the key is provided, so publishToMavenLocal works without it.
