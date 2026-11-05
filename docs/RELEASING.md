@@ -1,6 +1,6 @@
 # Releasing
 
-Kraft is published to Maven Central as `io.github.burkido:kraft`. `main` is the only long-lived branch: work happens on short branches that are squash-merged into `main` through pull requests, and a release is a tag on `main`.
+Kraft is published to Maven Central as `io.github.burkido:kraft`. `main` is the only long-lived branch: work happens on short branches that are squash-merged into `main` through pull requests, and a release is a GitHub release made from `main`.
 
 ## Versions
 
@@ -12,20 +12,15 @@ Kraft stays on `0.x` while the API can still change:
 
 ## Cutting a release
 
-1. Open a pull request that sets `VERSION_NAME` in [`gradle.properties`](../gradle.properties) and the version in the README's dependency snippet, then merge it.
-2. Tag the merge commit and push the tag:
+A release is a GitHub release. Nothing in the repository changes for it.
 
-   ```sh
-   git switch main && git pull
-   git tag -a v0.1.1 -m "Kraft 0.1.1"
-   git push origin v0.1.1
-   ```
+1. On GitHub, open **Releases**, then **Draft a new release**.
+2. Under **Choose a tag**, type the new tag, `v` followed by the version (for example `v0.1.1`), and create it on `main`.
+3. Press **Generate release notes**, edit them if you like, then press **Publish release**.
 
-   The tag has to be `v` followed by `VERSION_NAME`, or the workflow stops.
-3. The [Publish workflow](../.github/workflows/publish.yml) runs the tests on macOS, signs and uploads the artifacts to the Central Portal and creates the GitHub release with notes generated from the merged pull requests. It takes 10 to 15 minutes.
-4. On [central.sonatype.com](https://central.sonatype.com), open **Publish**, then **Deployments**. When the deployment shows **Validated**, press **Publish**. Maven Central can't take a release back, so this step stays manual. **Drop** discards the upload instead.
+Publishing the release starts the [Publish workflow](../.github/workflows/publish.yml). It reads the version from the tag, runs the tests on macOS, signs the artifacts, uploads them to the Central Portal and releases them. It takes 10 to 15 minutes, and the version usually resolves from Maven Central 15 to 30 minutes after that.
 
-The new version usually resolves from Maven Central 15 to 30 minutes later.
+Maven Central can't take a release back. If a release turns out broken, fix it and publish the next version. If the workflow fails before the upload, fix the cause and press **Re-run jobs** on the failed run.
 
 ## One-time setup
 
@@ -42,6 +37,6 @@ With the values in `local.properties` (`mavenCentralUsername`, `mavenCentralPass
 
 ## Publishing from your machine
 
-Only needed if the workflow is broken. With the same `local.properties` values, [`scripts/publish.sh`](../scripts/publish.sh) uploads the current version and stops at **Validated**, like the workflow.
+Only needed if the workflow is broken. With the same `local.properties` values, run [`scripts/publish.sh`](../scripts/publish.sh) with the version, for example `scripts/publish.sh 0.1.1`. It uploads and stops at **Validated**: on [central.sonatype.com](https://central.sonatype.com), open **Publish**, then **Deployments**, and press **Publish**, or **Drop** to discard the upload.
 
-To check the artifacts without uploading anything, run `./gradlew :effects:publishToMavenLocal` and look in `~/.m2/repository/io/github/burkido/`. CI does this on every pull request.
+To check the artifacts without uploading anything, run `./gradlew :effects:publishToMavenLocal` and look in `~/.m2/repository/io/github/burkido/`. Local builds use the placeholder version `0.0.0-LOCAL` from `gradle.properties`. CI does this on every pull request.

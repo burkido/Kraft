@@ -103,13 +103,15 @@ Effects respect the system's reduced-motion setting and pause when they're off s
 
 ### Adding it to your project
 
-Kraft is on Maven Central as an **experimental `0.x` release**. Add it to your shared module's `commonMain` dependencies:
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.burkido/kraft)](https://central.sonatype.com/artifact/io.github.burkido/kraft)
+
+Kraft is on Maven Central as an **experimental `0.x` release**. Add it to your shared module's `commonMain` dependencies, with `<version>` replaced by the latest version from the badge above:
 
 ```kotlin
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("io.github.burkido:kraft:0.1.0")
+            implementation("io.github.burkido:kraft:<version>")
         }
     }
 }
