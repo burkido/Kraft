@@ -31,4 +31,7 @@ include(":androidApp")
 include(":desktopApp")
 include(":effects")
 include(":shared")
-include(":film")
+// The showcase film's renderer is kept locally and isn't in the repository.
+if (file("film/build.gradle.kts").exists()) {
+    include(":film")
+}
