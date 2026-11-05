@@ -44,3 +44,6 @@ __pycache__/
 .DS_Store
 
 node_modules/
+
+# The showcase film's renderer and tools stay local, outside the repository
+film/

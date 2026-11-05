@@ -38,7 +38,7 @@ In practice, I described what I wanted, ran the app, compared it with the web ve
 - the effect ports, including turning Paper Design's liquid-metal GLSL shader into Kotlin,
 - the parity and golden tests that check the ports against the originals,
 - the app, navigation and design system,
-- the showcase film in `film/`: every frame is rendered from the real composables, with a soundtrack synthesized in Python.
+- the showcase film: every frame is rendered from the real composables, with a soundtrack synthesized in Python.
 
 I'm publishing it as both a usable library and a record of the experiment. The code is real and the tests pass. Still, treat it like any code you didn't write yourself and read it before you ship it.
 
@@ -178,7 +178,6 @@ shared/       The Kraft app (landing page, effect pages, playgrounds, design sys
 androidApp/   Android entry point
 iosApp/       iOS entry point (Xcode project)
 desktopApp/   Desktop (JVM) entry point
-film/         The showcase film, rendered offline from the real composables
 docs/media/   Images used in this README
 ```
 
@@ -201,15 +200,9 @@ This runs four kinds of check:
   <a href="https://www.youtube.com/watch?v=YOUR_VIDEO_ID"><img src="docs/media/poster.jpg" alt="Watch the Kraft film on YouTube" width="720"></a>
 </p>
 
-The film isn't a screen recording. `film/` is a small renderer that runs each shot as a Compose scene offscreen, on a virtual clock, one frame at a time, and pipes the frames into ffmpeg. A scripted "hand" provides the touches. The music and sound effects are synthesized in Python without samples, and every run produces identical output.
+The film isn't a screen recording. A small renderer runs each shot as a Compose scene offscreen, on a virtual clock, one frame at a time, and pipes the frames into ffmpeg. A scripted "hand" provides the touches. The music and sound effects are synthesized in Python without samples, and every run produces identical output.
 
-```sh
-film/tools/render.sh final 4          # render all shots at 1080p60, 4 JVMs in parallel
-python film/tools/score.py            # the soundtrack
-python film/tools/assemble.py final   # cut, grade and mux -> film/build/Kraft-final.mp4
-```
-
-You need `ffmpeg` on your path and `numpy scipy soundfile` for Python. The generated images and the voice line in `film/assets/` were made with OpenAI models and are checked in, so no API key is needed to render. [`film/README.md`](film/README.md) has the details.
+The generated images and the voice line in the film were made with OpenAI models. The renderer isn't part of this repository.
 
 ## Known limitations
 
