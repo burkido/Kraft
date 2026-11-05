@@ -220,6 +220,8 @@ You need `ffmpeg` on your path and `numpy scipy soundfile` for Python. The gener
 
 Issues and pull requests are welcome, whether it's a bug, a parity difference, a new platform target or an idea for an effect. For a bigger change, please open an issue first so we can talk it through.
 
+How versions are numbered and released is in [`docs/RELEASING.md`](docs/RELEASING.md).
+
 ## Credits
 
 - **[Libraries.dev](https://github.com/Jakubantalik/Libraries.dev)** by Jakub Antalik (MIT). The effects and the app are ports of its packages and website, including its spec data, bot shapes and demo images. Kraft wouldn't exist without it.
