@@ -199,7 +199,7 @@ private fun HeroCopy(center: Boolean, onBrowse: () -> Unit, onHowTo: () -> Unit)
             .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        BasicText("7 libraries", style = cssText(fonts.sans, 13f, 24.2f, FontWeight.Normal, Color(0xFFB5B5B5)))
+        BasicText("6 libraries", style = cssText(fonts.sans, 13f, 24.2f, FontWeight.Normal, Color(0xFFB5B5B5)))
         BasicText(
             "for Compose",
             style = cssText(fonts.sans, 13f, 24.2f, FontWeight.Normal, Color(0xFF939393)),

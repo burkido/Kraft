@@ -40,8 +40,9 @@ import com.burkido.kraft.library.LibraryId
 import org.jetbrains.compose.resources.painterResource
 
 /**
- * `.cards`: a six-track grid. Beam and Orbs span three tracks, the rest two, so the rows read
- * 2 · 3 · 2; below 1100 px it becomes two columns (max 664), below 740 px one.
+ * `.cards`: a six-track grid. Beam, Orbs, Gooey and Voice span three tracks, Metal and Image two,
+ * so the rows read 2 · 2 · 2 with the last row a third short; below 1100 px it becomes two columns
+ * (max 664), below 740 px one.
  */
 @Composable
 fun LibraryCards(onOpenLibrary: (LibraryId) -> Unit, modifier: Modifier = Modifier) {
@@ -51,10 +52,10 @@ fun LibraryCards(onOpenLibrary: (LibraryId) -> Unit, modifier: Modifier = Modifi
     val gap = if (oneColumn) 16.dp else 24.dp
     val rows: List<List<LibraryId?>> = when {
         oneColumn -> LibraryId.entries.map { listOf(it) }
-        twoColumns -> LibraryId.entries.chunked(2).map { if (it.size == 2) it else it + null }
+        twoColumns -> LibraryId.entries.chunked(2)
         else -> listOf(
             listOf(LibraryId.Beam, LibraryId.Orbs),
-            listOf(LibraryId.Gooey, LibraryId.Voice, LibraryId.Bots),
+            listOf(LibraryId.Gooey, LibraryId.Voice),
             listOf(LibraryId.Metal, LibraryId.Image, null),
         )
     }

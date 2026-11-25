@@ -49,7 +49,5 @@ class ScreenshotRender {
     @Test fun metalPhone() = shot("metal-phone", 390, 2720, 2f, library = "metal")
     @Test fun imageDesktop() = shot("image-desktop", 1440, 2298, 1f, library = "image")
     @Test fun imagePhone() = shot("image-phone", 390, 2800, 2f, library = "image")
-    @Test fun botsDesktop() = shot("bots-desktop", 1440, 2296, 1f, library = "bots")
-    @Test fun botsPhone() = shot("bots-phone", 390, 2900, 2f, library = "bots")
     @Test fun licensesDesktop() = shot("licenses-desktop", 1280, 1100, 1f, library = "licenses")
 }

@@ -30,8 +30,6 @@ import com.burkido.kraft.designsystem.BoxShadow
 import com.burkido.kraft.designsystem.LocalKraftFonts
 import com.burkido.kraft.designsystem.cssSurface
 import com.burkido.kraft.designsystem.cssText
-import com.burkido.kraft.effects.avatars.BotAvatar
-import com.burkido.kraft.effects.avatars.BotAvatarType
 import com.burkido.kraft.effects.beam.BeamSize
 import com.burkido.kraft.effects.beam.BorderBeam
 import com.burkido.kraft.effects.core.EffectActivity
@@ -77,7 +75,6 @@ fun BoxScope.LibraryScene(library: LibraryId, width: Dp, height: Dp, compact: Bo
         LibraryId.Metal -> if (compact) MetalTileScene(width, playing) else MetalCardScene(width, height, playing)
         LibraryId.Image -> if (compact) ImageTileScene(width, playing) else ImageCardScene(width, height, playing)
         LibraryId.Voice -> VoiceCardScene(width, height, playing)
-        LibraryId.Bots -> BotsCardScene(width, height, playing)
     }
 }
 
@@ -323,26 +320,6 @@ private fun BoxScope.VoiceCardScene(width: Dp, height: Dp, playing: Boolean) {
                 borderRadius = 22.dp,
                 background = { RecordingPillSurface() },
             ) { RecordingPillForeground(running = true, paused = paused, resetKey = 0, startSeconds = 12) }
-        }
-    }
-}
-
-// ── Bots ──────────────────────────────────────────────────────────────────────────────────
-
-/** The bots card: Clover, Flower and Star idling a third of the frame apart. */
-@Composable
-private fun BoxScope.BotsCardScene(width: Dp, height: Dp, playing: Boolean) {
-    val w = coverWidth(width, height, 2488f / 2160f)
-    val size = w * 0.207f
-    Box(Modifier.align(Alignment.Center)) {
-        listOf(BotAvatarType.Clover to -0.3265f, BotAvatarType.Flower to 0f, BotAvatarType.Star to 0.3265f).forEach { (type, x) ->
-            BotAvatar(
-                Modifier.align(Alignment.Center).offset(x = w * x),
-                type = type,
-                size = size,
-                paused = !playing,
-                interactive = false,
-            )
         }
     }
 }
