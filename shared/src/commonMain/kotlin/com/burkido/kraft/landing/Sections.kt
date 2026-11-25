@@ -214,7 +214,7 @@ private fun QuoteCard(quote: Quote, modifier: Modifier) {
 // ── How to use ────────────────────────────────────────────────────────────────────────────
 
 private val STEPS = listOf(
-    "Add the dependency" to "One Gradle line brings all seven effects to Android, iOS and desktop.",
+    "Add the dependency" to "One Gradle line brings all six effects to Android, iOS and desktop.",
     "Wrap your composable" to "Put BorderBeam, ThinkingOrb or MetalFx around the UI you already have.",
     "Make it yours" to "Tune it in each library's playground, then copy the exact configuration.",
 )

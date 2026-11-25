@@ -58,7 +58,7 @@ private class Notice(val name: String, val url: String, val holder: String, val 
 private val Notices = listOf(
     Notice(
         "Libraries.dev", "https://github.com/Jakubantalik/Libraries.dev", "Copyright (c) 2026 Jakub Antalik", "MIT License",
-        "The seven effects and this app are ports of its packages and site, with its spec data, bot shapes and demo images.",
+        "The six effects and this app are ports of its packages and site, with its spec data and demo images.",
         "LibrariesDev-MIT.txt",
     ),
     Notice(

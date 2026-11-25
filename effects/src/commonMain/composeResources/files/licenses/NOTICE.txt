@@ -8,9 +8,8 @@ next to this file.
 Libraries.dev (https://github.com/Jakubantalik/Libraries.dev)
   Copyright (c) 2026 Jakub Antalik
   Licensed under the MIT License (LibrariesDev-MIT.txt).
-  The effects (border beam, thinking orbs, bot avatars, liquid gooey, voice
-  glow, metal, image generation) are ports of its packages, including its
-  spec data and bot shapes.
+  The effects (border beam, thinking orbs, liquid gooey, voice glow, metal,
+  image generation) are ports of its packages, including its spec data.
 
 Paper Shaders (https://github.com/paper-design/shaders)
   Copyright (c) Paper Design, Inc.

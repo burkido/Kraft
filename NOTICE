@@ -10,10 +10,10 @@ in effects/src/commonMain/composeResources/files/licenses/.
 Libraries.dev (https://github.com/Jakubantalik/Libraries.dev)
   Copyright (c) 2026 Jakub Antalik
   Licensed under the MIT License (LibrariesDev-MIT.txt).
-  The effects in :effects (border beam, thinking orbs, bot avatars, liquid
-  gooey, voice glow, metal, image generation) and the app in :shared are
-  ports of its packages and site, including its spec data, bot shapes and
-  demo images (gen_1.jpg, gen_2.jpg, gen_3.jpg).
+  The effects in :effects (border beam, thinking orbs, liquid gooey, voice
+  glow, metal, image generation) and the app in :shared are ports of its
+  packages and site, including its spec data and demo images (gen_1.jpg,
+  gen_2.jpg, gen_3.jpg).
 
 Paper Shaders (https://github.com/paper-design/shaders)
   Copyright (c) Paper Design, Inc.

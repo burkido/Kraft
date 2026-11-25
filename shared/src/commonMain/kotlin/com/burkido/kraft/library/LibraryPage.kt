@@ -27,7 +27,6 @@ fun pageFor(id: LibraryId): LibraryPage = when (id) {
     LibraryId.Gooey -> GooeyPage
     LibraryId.Metal -> MetalPage
     LibraryId.Image -> ImagePage
-    LibraryId.Bots -> BotsPage
 }
 
 private val INSTALL_CODE = """

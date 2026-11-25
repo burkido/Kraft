@@ -1,16 +1,16 @@
 <h1 align="center">Kraft</h1>
 
 <p align="center">
-  Seven polished UI effects for Compose Multiplatform. They run on Android, iOS and desktop from one Kotlin codebase.
+  Six polished UI effects for Compose Multiplatform. They run on Android, iOS and desktop from one Kotlin codebase.
 </p>
 
 <p align="center">
-  <img src="docs/media/teaser.webp" alt="Kraft effects in motion: thinking orbs, border beam, liquid metal, gooey, voice glow, bot avatars, image generation" width="800">
+  <img src="docs/media/teaser.webp" alt="Kraft effects in motion: thinking orbs, border beam, liquid metal, gooey, voice glow, image generation" width="800">
 </p>
 
 <p align="center">
   <!-- TODO: replace YOUR_VIDEO_ID with the YouTube video ID once the film is uploaded -->
-  <a href="https://www.youtube.com/watch?v=YOUR_VIDEO_ID"><b>▶ Watch the 70-second film on YouTube</b></a>
+  <a href="https://www.youtube.com/watch?v=YOUR_VIDEO_ID"><b>▶ Watch the 65-second film on YouTube</b></a>
 </p>
 
 > [!WARNING]
@@ -24,7 +24,7 @@
 
 Kraft contains two things:
 
-1. **`:effects`**, a Compose Multiplatform library with all seven effects. Each effect is a plain composable that wraps your existing UI. You don't write shaders and there's no extra setup.
+1. **`:effects`**, a Compose Multiplatform library with all six effects. Each effect is a plain composable that wraps your existing UI. You don't write shaders and there's no extra setup.
 2. **The Kraft app**, a port of the Libraries.dev website itself. It has a landing page, a page for each effect with live previews, a playground with controls, and copyable code. It runs on Android, iOS and desktop.
 
 Most of the work went into matching the originals. The thinking orbs are checked against the web engine's own golden data, down to the position of every dot. The other effects render the same scenes as upstream's parity harness, so you can put them next to the browser captures and compare them directly.
@@ -48,8 +48,8 @@ I'm publishing it as both a usable library and a record of the experiment. The c
 |---|---|
 | <img src="docs/media/film-orbs.jpg" alt="Thinking orbs"><br>**Thinking orbs.** Nine animated loading states for an AI at work: Working, Searching, Solving, Listening and more. | <img src="docs/media/film-beam.jpg" alt="Border beam"><br>**Border beam.** A soft glow that travels around the border of anything in progress. |
 | <img src="docs/media/film-metal.jpg" alt="Liquid metal"><br>**Liquid metal.** Chrome buttons, badges and text that bend under your finger and reflect their neighbours. | <img src="docs/media/film-gooey.jpg" alt="Gooey"><br>**Gooey.** Surfaces that split, merge and stretch like liquid. Good for menus that pop out of a button. |
-| <img src="docs/media/film-voice.jpg" alt="Voice glow"><br>**Voice glow.** A glow that rises with your voice. It can use the real microphone or any audio level you give it. | <img src="docs/media/film-bots.jpg" alt="Bot avatars"><br>**Bot avatars.** 18 characters that blink, look around, sleep and get to work. |
-| <img src="docs/media/film-image.jpg" alt="Image generation"><br>**Image generation.** A pixel-mosaic loader that turns into the finished image. | <img src="docs/media/film-code.jpg" alt="One composable away"><br>**One composable away.** Every effect is a single composable, and the same code runs on Android, iOS and desktop. |
+| <img src="docs/media/film-voice.jpg" alt="Voice glow"><br>**Voice glow.** A glow that rises with your voice. It can use the real microphone or any audio level you give it. | <img src="docs/media/film-image.jpg" alt="Image generation"><br>**Image generation.** A pixel-mosaic loader that turns into the finished image. |
+| <img src="docs/media/film-code.jpg" alt="One composable away"><br>**One composable away.** Every effect is a single composable, and the same code runs on Android, iOS and desktop. | |
 
 ## Screenshots
 
@@ -76,8 +76,6 @@ Each effect wraps the UI you already have:
 import com.burkido.kraft.effects.beam.BorderBeam
 import com.burkido.kraft.effects.orbs.ThinkingOrb
 import com.burkido.kraft.effects.orbs.OrbState
-import com.burkido.kraft.effects.avatars.BotAvatar
-import com.burkido.kraft.effects.avatars.BotAvatarType
 import com.burkido.kraft.effects.metal.MetalFx
 
 // A glowing border around a text field while the agent works
@@ -87,9 +85,6 @@ BorderBeam(active = isWorking) {
 
 // A thinking indicator
 ThinkingOrb(state = OrbState.Searching)
-
-// An animated face for your assistant
-BotAvatar(type = BotAvatarType.Ghost, size = 48.dp)
 
 // A liquid-metal send button
 MetalFx {
@@ -151,7 +146,7 @@ cd Kraft
 ./gradlew :desktopApp:run
 
 # Open a specific effect page directly
-./gradlew :desktopApp:run --args="--library metal"   # beam, orbs, gooey, voice, bots, metal, image
+./gradlew :desktopApp:run --args="--library metal"   # beam, orbs, gooey, voice, metal, image
 
 # Desktop with Compose Hot Reload
 ./gradlew :desktopApp:hotRun
@@ -173,7 +168,7 @@ The Voice page's playground asks for microphone access so the glow can follow yo
 ## Project structure
 
 ```
-effects/      The library: the seven effects, as a Compose Multiplatform module
+effects/      The library: the six effects, as a Compose Multiplatform module
 shared/       The Kraft app (landing page, effect pages, playgrounds, design system)
 androidApp/   Android entry point
 iosApp/       iOS entry point (Xcode project)
@@ -219,7 +214,7 @@ How versions are numbered and released is in [`docs/RELEASING.md`](docs/RELEASIN
 
 ## Credits
 
-- **[Libraries.dev](https://github.com/Jakubantalik/Libraries.dev)** by Jakub Antalik (MIT). The effects and the app are ports of its packages and website, including its spec data, bot shapes and demo images. Kraft wouldn't exist without it.
+- **[Libraries.dev](https://github.com/Jakubantalik/Libraries.dev)** by Jakub Antalik (MIT). The effects and the app are ports of its packages and website, including its spec data and demo images. Kraft wouldn't exist without it.
 - **[Paper Shaders](https://github.com/paper-design/shaders)** by Paper Design (Apache 2.0). The liquid-metal material is a Kotlin port of its `liquidMetal` shader.
 - **[Inter](https://github.com/rsms/inter)** and **[Roboto Mono](https://github.com/googlefonts/robotomono)** fonts (SIL OFL 1.1).
 - Written with **Claude Opus 5.5**.

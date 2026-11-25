@@ -5,8 +5,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.graphics.ImageBitmap
 
 /**
- * A platform bitmap that CPU-rendered effects (the metal sheet, avatar plastic caps, image
- * mosaics) upload pixels into.
+ * A platform bitmap that CPU-rendered effects (the metal sheet, image mosaics) upload pixels into.
  *
  * Pixels are RGBA_8888, premultiplied, sRGB, row-major: `width * height * 4` bytes.
  */
